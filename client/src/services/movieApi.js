@@ -191,16 +191,7 @@ export async function getBollywoodMovies() {
 }
 
 export async function getHollywoodMovies() {
-  const listKey = 'action-adventure'
-  const data = await fetchJson(`${SAMPLEAPIS_BASE}/${listKey}`)
-  const list = asArray(data)
-  return list.slice(0, 18).map((m) =>
-    normalizeSampleMovie(m, {
-      listKey,
-      language: 'en',
-      languageLabel: 'English',
-    }),
-  )
+  return getTrendingMovies()
 }
 
 export async function getNepaliMovies() {
