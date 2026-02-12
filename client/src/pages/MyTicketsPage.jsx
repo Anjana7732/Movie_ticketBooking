@@ -2,6 +2,18 @@ import { Link } from 'react-router-dom'
 import { useBooking } from '../state/BookingContext.jsx'
 import { formatCurrency } from '../utils/formatCurrency.js'
 
+const PAYMENT_LABELS = {
+  card: 'Credit / Debit Card',
+  paypal: 'PayPal',
+  esewa: 'eSewa',
+  khalti: 'Khalti',
+  cash: 'Cash on Counter',
+}
+
+function getPaymentLabel(method) {
+  return PAYMENT_LABELS[method] ?? method ?? '-'
+}
+
 export function MyTicketsPage() {
   const { tickets } = useBooking()
 
@@ -95,13 +107,21 @@ export function MyTicketsPage() {
                   <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-[11px] text-slate-200 sm:text-xs">
                     <div>
                       <dt className="text-[10px] uppercase tracking-[0.18em] text-slate-400">
-                        Date & time
+                        Booking ID
+                      </dt>
+                      <dd className="font-semibold tracking-wide text-violet-300">
+                        {ticket.bookingId ?? '-'}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="text-[10px] uppercase tracking-[0.18em] text-slate-400">
+                        Date & Time
                       </dt>
                       <dd className="font-medium">{bookingDateLabel}</dd>
                     </div>
                     <div>
                       <dt className="text-[10px] uppercase tracking-[0.18em] text-slate-400">
-                        Show time
+                        Show Time
                       </dt>
                       <dd className="font-medium">{ticket.showtime}</dd>
                     </div>
@@ -117,7 +137,15 @@ export function MyTicketsPage() {
                     </div>
                     <div>
                       <dt className="text-[10px] uppercase tracking-[0.18em] text-slate-400">
-                        Total price
+                        Payment Method
+                      </dt>
+                      <dd className="font-medium">
+                        {getPaymentLabel(ticket.paymentMethod)}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="text-[10px] uppercase tracking-[0.18em] text-slate-400">
+                        Total Price
                       </dt>
                       <dd className="font-semibold text-emerald-300">
                         {formatCurrency(
@@ -127,6 +155,20 @@ export function MyTicketsPage() {
                       </dd>
                     </div>
                   </dl>
+                  {/* Customer info row */}
+                  {ticket.customerName && (
+                    <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-slate-800/60 pt-2 text-[10px] text-slate-400">
+                      <span>
+                        Booked by{' '}
+                        <span className="font-medium text-slate-300">
+                          {ticket.customerName}
+                        </span>
+                      </span>
+                      {ticket.customerEmail && (
+                        <span>· {ticket.customerEmail}</span>
+                      )}
+                    </div>
+                  )}
                 </div>
               </article>
             )
