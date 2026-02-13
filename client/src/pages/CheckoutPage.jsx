@@ -160,50 +160,132 @@ function Spinner() {
   )
 }
 
-function SuccessModal({ bookingId, onGoToTickets }) {
+/* ────────────────────────────────────────────
+   "Bill Paid" popup — banking-style overlay
+   that appears immediately after payment and
+   requires the user to press Done.
+   ──────────────────────────────────────────── */
+
+const PAYMENT_METHOD_LABELS = {
+  card: 'Credit / Debit Card',
+  paypal: 'PayPal',
+  esewa: 'eSewa',
+  khalti: 'Khalti',
+  cash: 'Cash on Counter',
+}
+
+function BillPaidPopup({ data, formattedTotal, onDone }) {
+  const [animReady, setAnimReady] = useState(false)
+
+  useEffect(() => {
+    // Trigger enter animation on next frame
+    const raf = requestAnimationFrame(() => setAnimReady(true))
+    return () => cancelAnimationFrame(raf)
+  }, [])
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-      <div className="mx-4 flex w-full max-w-md flex-col items-center gap-5 rounded-3xl border border-emerald-500/30 bg-slate-950 p-8 shadow-[0_24px_80px_rgba(16,185,129,0.15)] animate-in">
-        {/* Checkmark circle */}
-        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-emerald-500/15 shadow-[0_0_40px_rgba(16,185,129,0.3)]">
-          <svg
-            className="h-10 w-10 text-emerald-400"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2.5}
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md">
+      <div
+        className={`relative mx-4 flex w-full max-w-sm flex-col items-center overflow-hidden rounded-3xl border border-emerald-500/30 bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 shadow-[0_32px_100px_rgba(16,185,129,0.25)] transition-all duration-500 ${
+          animReady
+            ? 'scale-100 opacity-100 translate-y-0'
+            : 'scale-90 opacity-0 translate-y-6'
+        }`}
+      >
+        {/* Green top bar */}
+        <div className="h-1.5 w-full bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-500" />
+
+        <div className="flex w-full flex-col items-center gap-5 px-6 py-8">
+          {/* Animated checkmark */}
+          <div className="relative">
+            <div className="flex h-24 w-24 items-center justify-center rounded-full bg-emerald-500/15 shadow-[0_0_60px_rgba(16,185,129,0.35)]">
+              <svg
+                className={`h-12 w-12 text-emerald-400 transition-all duration-700 delay-200 ${
+                  animReady ? 'scale-100 opacity-100' : 'scale-50 opacity-0'
+                }`}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2.5}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+            </div>
+            {/* Pulse ring */}
+            <div className="absolute inset-0 animate-ping rounded-full bg-emerald-500/10" />
+          </div>
+
+          {/* Main title */}
+          <div className="space-y-1 text-center">
+            <h2 className="text-2xl font-bold text-slate-50">Bill Paid!</h2>
+            <p className="text-sm text-slate-400">
+              Your payment was successful
+            </p>
+          </div>
+
+          {/* Amount */}
+          <div className="flex flex-col items-center gap-1">
+            <p className="text-4xl font-extrabold tracking-tight text-emerald-400">
+              {formattedTotal}
+            </p>
+            <p className="text-[11px] uppercase tracking-[0.2em] text-slate-500">
+              Amount Paid
+            </p>
+          </div>
+
+          {/* Ticket details mini-card */}
+          <div className="w-full space-y-2.5 rounded-2xl border border-slate-700/60 bg-slate-800/40 px-5 py-4">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-slate-400">Movie</span>
+              <span className="max-w-[55%] truncate text-right font-semibold text-slate-100">
+                {data.movieTitle}
+              </span>
+            </div>
+            <div className="h-px bg-slate-700/50" />
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-slate-400">Tickets</span>
+              <span className="font-medium text-slate-200">
+                {data.seatCount} {data.seatCount === 1 ? 'seat' : 'seats'}
+              </span>
+            </div>
+            <div className="h-px bg-slate-700/50" />
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-slate-400">Payment</span>
+              <span className="font-medium text-slate-200">
+                {PAYMENT_METHOD_LABELS[data.paymentMethod] ?? data.paymentMethod}
+              </span>
+            </div>
+            <div className="h-px bg-slate-700/50" />
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-slate-400">Booking ID</span>
+              <span className="font-bold tracking-wider text-emerald-300">
+                {data.bookingId}
+              </span>
+            </div>
+          </div>
+
+          {/* Subtle note */}
+          <p className="text-center text-[11px] text-slate-500">
+            Your ticket has been saved to your wallet. Tap Done to view your
+            booking receipt.
+          </p>
+
+          {/* Done button */}
+          <button
+            type="button"
+            onClick={onDone}
+            className="w-full rounded-full bg-emerald-500 px-6 py-3.5 text-base font-bold text-slate-950 shadow-[0_0_30px_rgba(16,185,129,0.5)] transition hover:bg-emerald-400 active:scale-[0.97]"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M5 13l4 4L19 7"
-            />
-          </svg>
+            Done
+          </button>
         </div>
-        <div className="space-y-2 text-center">
-          <h2 className="text-xl font-semibold text-slate-50">
-            Payment Successful!
-          </h2>
-          <p className="text-sm text-slate-300">
-            Your ticket has been booked. A confirmation has been saved to your
-            ticket wallet.
-          </p>
-        </div>
-        <div className="rounded-xl bg-slate-900/80 px-4 py-2.5 text-center">
-          <p className="text-[11px] uppercase tracking-[0.18em] text-slate-400">
-            Booking ID
-          </p>
-          <p className="mt-0.5 text-base font-bold tracking-wider text-emerald-300">
-            {bookingId}
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={onGoToTickets}
-          className="w-full rounded-full bg-emerald-500 px-5 py-3 text-sm font-semibold text-slate-950 shadow-[0_0_26px_rgba(16,185,129,0.5)] transition hover:bg-emerald-400"
-        >
-          View My Tickets
-        </button>
+
+        {/* Green bottom bar */}
+        <div className="h-1 w-full bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-500" />
       </div>
     </div>
   )
@@ -224,14 +306,14 @@ export function CheckoutPage() {
     selectedSeats,
     setSelectedSeats,
     setLastBooking,
+    setLastConfirmedTicket,
     addTicket,
   } = useBooking()
 
   const [formData, setFormData] = useState(INITIAL_FORM)
   const [errors, setErrors] = useState({})
   const [processing, setProcessing] = useState(false)
-  const [showSuccess, setShowSuccess] = useState(false)
-  const [completedBookingId, setCompletedBookingId] = useState('')
+  const [paidPopup, setPaidPopup] = useState(null) // holds popup data after payment
 
   /* Redirect if data is missing */
   const canCheckout =
@@ -242,10 +324,11 @@ export function CheckoutPage() {
     selectedSeats.length > 0
 
   useEffect(() => {
-    if (!canCheckout) {
+    // Don't redirect if the "Bill Paid" popup is showing
+    if (!canCheckout && !paidPopup) {
       navigate('/booking')
     }
-  }, [canCheckout, navigate])
+  }, [canCheckout, paidPopup, navigate])
 
   /* Computed values */
   const pricePerSeat = useMemo(
@@ -403,9 +486,23 @@ export function CheckoutPage() {
 
     addTicket(ticket)
     setSelectedSeats([])
-    setCompletedBookingId(bookingId)
+
+    // Save confirmed ticket data for the confirmation page
+    setLastConfirmedTicket({
+      ...ticket,
+      movie: selectedMovie,
+    })
+
     setProcessing(false)
-    setShowSuccess(true)
+
+    // Show the "Bill Paid" popup — user must click Done to continue
+    setPaidPopup({
+      bookingId,
+      movieTitle: selectedMovie.title,
+      totalPrice,
+      seatCount: selectedSeats.length,
+      paymentMethod: formData.paymentMethod,
+    })
   }, [
     canCheckout,
     bookingKey,
@@ -421,18 +518,32 @@ export function CheckoutPage() {
     totalPrice,
     formData,
     setLastBooking,
+    setLastConfirmedTicket,
     addTicket,
     setSelectedSeats,
+    navigate,
   ])
 
-  const handleGoToTickets = useCallback(() => {
-    setShowSuccess(false)
-    navigate('/tickets')
+  /* Handle "Done" on the paid popup → go to confirmation receipt */
+  const handlePaidDone = useCallback(() => {
+    setPaidPopup(null)
+    navigate('/confirmation')
   }, [navigate])
 
-  /* Guard render */
-  if (!canCheckout || !selectedMovie) {
+  /* Guard render — allow rendering if popup is active even though seats are cleared */
+  if ((!canCheckout || !selectedMovie) && !paidPopup) {
     return null
+  }
+
+  /* If the popup is visible but page data is gone, only show the popup */
+  if (paidPopup && (!canCheckout || !selectedMovie)) {
+    return (
+      <BillPaidPopup
+        data={paidPopup}
+        formattedTotal={formatCurrency(paidPopup.totalPrice, selectedCountry)}
+        onDone={handlePaidDone}
+      />
+    )
   }
 
   /* Get the label for the selected payment method */
@@ -441,11 +552,12 @@ export function CheckoutPage() {
 
   return (
     <>
-      {/* Success Modal */}
-      {showSuccess && (
-        <SuccessModal
-          bookingId={completedBookingId}
-          onGoToTickets={handleGoToTickets}
+      {/* ── Banking-style "Bill Paid" popup ── */}
+      {paidPopup && (
+        <BillPaidPopup
+          data={paidPopup}
+          formattedTotal={formatCurrency(paidPopup.totalPrice, selectedCountry)}
+          onDone={handlePaidDone}
         />
       )}
 

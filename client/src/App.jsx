@@ -5,6 +5,7 @@ import { MovieDetailsPage } from './pages/MovieDetailsPage.jsx'
 import { BookingPage } from './pages/BookingPage.jsx'
 import { SummaryPage } from './pages/SummaryPage.jsx'
 import { CheckoutPage } from './pages/CheckoutPage.jsx'
+import { ConfirmationPage } from './pages/ConfirmationPage.jsx'
 import { MyTicketsPage } from './pages/MyTicketsPage.jsx'
 import { ProfilePage } from './pages/ProfilePage.jsx'
 
@@ -16,6 +17,7 @@ function App() {
         <Route path="/movie/:id" element={<MovieDetailsPage />} />
         <Route path="/booking" element={<BookingPage />} />
         <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/confirmation" element={<ConfirmationPage />} />
         <Route path="/summary" element={<SummaryPage />} />
         <Route path="/tickets" element={<MyTicketsPage />} />
         <Route path="/profile" element={<ProfilePage />} />

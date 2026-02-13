@@ -16,6 +16,7 @@ export function BookingProvider({ children }) {
   const [selectedShowtime, setSelectedShowtime] = useState('')
   const [selectedSeats, setSelectedSeats] = useState([])
   const [lastBooking, setLastBooking] = useState(null)
+  const [lastConfirmedTicket, setLastConfirmedTicket] = useState(null)
   const [tickets, setTickets] = useState(() => loadTickets())
 
   const value = useMemo(
@@ -34,6 +35,8 @@ export function BookingProvider({ children }) {
       setSelectedSeats,
       lastBooking,
       setLastBooking,
+      lastConfirmedTicket,
+      setLastConfirmedTicket,
       tickets,
       addTicket: (ticketInput) => {
         const ticket = {
@@ -76,6 +79,7 @@ export function BookingProvider({ children }) {
       selectedShowtime,
       selectedSeats,
       lastBooking,
+      lastConfirmedTicket,
       tickets,
     ],
   )
